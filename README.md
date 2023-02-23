@@ -1,4 +1,4 @@
-MovieTags
+#MovieTags
 MovieTags is a program that searches for movie tags and displays the results in a user-friendly manner.
 
 Functional Requirements
