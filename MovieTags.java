@@ -92,8 +92,8 @@ public class MovieTags {
             System.exit(1);
         }
 
-        // Sort the list of TagEntry objects by count
-        Collections.sort(tagEntries);
+        // Sort the list of TagEntry objects by count using merge sort
+        mergeSort(tagEntries);
         return tagEntries;
     }
 
