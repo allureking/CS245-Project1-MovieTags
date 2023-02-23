@@ -11,6 +11,7 @@ import java.util.*;
  * @author [Honghuai Ke]
  * @date [02/22/2023]
  */
+
 public class MovieTags {
     // The name of the file that contains the movie tags.
     private static final String TAGS_FILE = "tags.csv";
@@ -59,8 +60,7 @@ public class MovieTags {
      * @return A list of TagEntries sorted by their count.
      */
     private static List<TagEntry> readTagsFile(String filename) {
-        // Use a map to count the frequency of each tag.
-        Map<String, Integer> tagCounts = new HashMap<>();
+        List<TagEntry> tagEntries = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
             // skip the header row
@@ -71,22 +71,77 @@ public class MovieTags {
                 // Split the line into fields and extract the tag.
                 String[] fields = line.split(",", -1);
                 String tag = fields[2];
-                tagCounts.put(tag, tagCounts.getOrDefault(tag, 0) + 1);
+
+                // Check if a TagEntry object with the current tag already exists
+                boolean found = false;
+                for (TagEntry entry : tagEntries) {
+                    if (entry.tag.equals(tag)) {
+                        entry.count++;
+                        found = true;
+                        break;
+                    }
+                }
+
+                // If a TagEntry object with the current tag doesn't exist, add a new one to the list
+                if (!found) {
+                    tagEntries.add(new TagEntry(tag, 1));
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
 
-        // Convert the map entries to TagEntries and sort by count.
-        List<TagEntry> tagEntries = new ArrayList<>();
-        for (Map.Entry<String, Integer> entry : tagCounts.entrySet()) {
-            tagEntries.add(new TagEntry(entry.getKey(), entry.getValue()));
-        }
+        // Sort the list of TagEntry objects by count
         Collections.sort(tagEntries);
         return tagEntries;
     }
 
+
+    /**
+     * Sort the list of TagEntries using the merge sort algorithm.
+     *
+     * @param list The list to be sorted.
+     */
+    private static void mergeSort(List<TagEntry> list) {
+        if (list.size() > 1) {
+            int middle = list.size() / 2;
+            List<TagEntry> left = list.subList(0, middle);
+            List<TagEntry> right = list.subList(middle, list.size());
+            mergeSort(left);
+            mergeSort(right);
+            merge(left, right, list);
+        }
+    }
+
+    /**
+     * Merge two sorted lists into a single sorted list.
+     *
+     * @param left  The left list to merge.
+     * @param right The right list to merge.
+     * @param list  The merged list.
+     */
+    private static void merge(List<TagEntry> left, List<TagEntry> right, List<TagEntry> list) {
+        int i = 0;
+        int j = 0;
+        while (i < left.size() && j < right.size()) {
+            if (left.get(i).compareTo(right.get(j)) > 0) {
+                list.set(i + j, left.get(i));
+                i++;
+            } else {
+                list.set(i + j, right.get(j));
+                j++;
+            }
+        }
+        while (i < left.size()) {
+            list.set(i + j, left.get(i));
+            i++;
+        }
+        while (j < right.size()) {
+            list.set(i + j, right.get(j));
+            j++;
+        }
+    }
 
     /**
      * Print the most and least popular tags.
@@ -187,3 +242,4 @@ public class MovieTags {
         scanner.close();
     }
 }
+
